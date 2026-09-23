@@ -55,11 +55,10 @@ describe('VerifyController (e2e)', () => {
       .expect(400);
   });
 
-  it('POST /api/verify/cbe rejects legacy references', async () => {
+  it('POST /api/verify/cbe rejects unsupported references', async () => {
     mockCbeVerifier.verify.mockResolvedValue({
       success: false,
-      error:
-        'Legacy CBE receipts are not supported. Use a mbreciept.cbe.com.et token or URL.',
+      error: 'Unsupported CBE reference.',
       statusCode: 400,
     });
 
@@ -70,8 +69,7 @@ describe('VerifyController (e2e)', () => {
 
     expect(res.body).toEqual({
       success: false,
-      error:
-        'Legacy CBE receipts are not supported. Use a mbreciept.cbe.com.et token or URL.',
+      error: 'Unsupported CBE reference.',
     });
   });
 

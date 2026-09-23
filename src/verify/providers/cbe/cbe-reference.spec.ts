@@ -1,55 +1,36 @@
-import {
-  extractNewCbeToken,
-  isLegacyCbeInput,
-  isNewCbeReference,
-} from './cbe-reference';
+import { extractCbeToken, isCbeReference } from './cbe-reference';
 
 describe('cbe-reference', () => {
-  describe('extractNewCbeToken', () => {
+  describe('extractCbeToken', () => {
     it('extracts token from mbreciept URL', () => {
       expect(
-        extractNewCbeToken(
-          'https://mbreciept.cbe.com.et/AbCdEfGhIjKlMnOp',
-        ),
+        extractCbeToken('https://mbreciept.cbe.com.et/AbCdEfGhIjKlMnOp'),
       ).toBe('AbCdEfGhIjKlMnOp');
     });
 
-    it('accepts bare new tokens', () => {
-      expect(extractNewCbeToken('AbCdEfGhIjKlMnOpQr')).toBe(
+    it('accepts bare tokens', () => {
+      expect(extractCbeToken('AbCdEfGhIjKlMnOpQr')).toBe(
         'AbCdEfGhIjKlMnOpQr',
       );
     });
 
-    it('rejects legacy FT references', () => {
-      expect(extractNewCbeToken('FT2513001V2G')).toBeNull();
+    it('rejects short or invalid references', () => {
+      expect(extractCbeToken('FT2513001V2G')).toBeNull();
+      expect(extractCbeToken('short')).toBeNull();
     });
   });
 
-  describe('isNewCbeReference', () => {
-    it('returns true for valid new references', () => {
-      expect(isNewCbeReference('AbCdEfGhIjKlMnOpQr')).toBe(true);
-    });
-
-    it('returns false for legacy FT references', () => {
-      expect(isNewCbeReference('FT2513001V2G')).toBe(false);
-    });
-  });
-
-  describe('isLegacyCbeInput', () => {
-    it('detects FT references', () => {
-      expect(isLegacyCbeInput('FT2513001V2G')).toBe(true);
-    });
-
-    it('detects legacy apps.cbe.com.et URLs', () => {
+  describe('isCbeReference', () => {
+    it('returns true for valid references', () => {
+      expect(isCbeReference('AbCdEfGhIjKlMnOpQr')).toBe(true);
       expect(
-        isLegacyCbeInput(
-          'https://apps.cbe.com.et:100/?id=FT2513001V2G12345678',
-        ),
+        isCbeReference('https://mbreciept.cbe.com.et/AbCdEfGhIjKlMnOp'),
       ).toBe(true);
     });
 
-    it('returns false for new tokens', () => {
-      expect(isLegacyCbeInput('AbCdEfGhIjKlMnOpQr')).toBe(false);
+    it('returns false for unsupported references', () => {
+      expect(isCbeReference('FT2513001V2G')).toBe(false);
+      expect(isCbeReference('short')).toBe(false);
     });
   });
 });

@@ -11,11 +11,7 @@ import {
   BankVerifyInput,
 } from '../bank-verifier.interface';
 
-import {
-  extractNewCbeToken,
-  isLegacyCbeInput,
-  isNewCbeReference,
-} from './cbe-reference';
+import { extractCbeToken } from './cbe-reference';
 
 interface CbeTransactionResponse {
   id?: string;
@@ -45,38 +41,19 @@ export class CbeVerifier implements BankVerifier {
   ) {}
 
   async verify(input: BankVerifyInput): Promise<VerifyResult> {
-    const reference = input.reference.trim();
-
-    if (isLegacyCbeInput(reference)) {
-      return {
-        success: false,
-        error:
-          'Legacy CBE receipts are not supported. Use a mbreciept.cbe.com.et token or URL.',
-        statusCode: 400,
-      };
-    }
-
-    if (!isNewCbeReference(reference)) {
-      return {
-        success: false,
-        error: 'Invalid CBE reference format.',
-        statusCode: 400,
-      };
-    }
-
-    const token = extractNewCbeToken(reference);
+    const token = extractCbeToken(input.reference);
     if (!token) {
       return {
         success: false,
-        error: 'Invalid CBE reference format.',
+        error: 'Unsupported CBE reference.',
         statusCode: 400,
       };
     }
 
-    return this.verifyNew(token);
+    return this.verifyReceipt(token);
   }
 
-  private async verifyNew(token: string): Promise<VerifyResult> {
+  private async verifyReceipt(token: string): Promise<VerifyResult> {
     const url = `https://mb.cbe.com.et/api/v1/transactions/public/transaction-detail/${token}`;
     const appId =
       this.configService.get<string>('CBE_APP_ID') || DEFAULT_CBE_APP_ID;
@@ -87,7 +64,7 @@ export class CbeVerifier implements BankVerifier {
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         this.logger.log(
-          `Attempting new CBE JSON fetch (${attempt}/${MAX_RETRIES}): ${url}`,
+          `Attempting CBE JSON fetch (${attempt}/${MAX_RETRIES}): ${url}`,
         );
 
         const response = await firstValueFrom(
@@ -119,7 +96,7 @@ export class CbeVerifier implements BankVerifier {
           statusCode === 504;
 
         this.logger.warn(
-          `New CBE verification attempt ${attempt}/${MAX_RETRIES} failed: ${axiosError.message}`,
+          `CBE verification attempt ${attempt}/${MAX_RETRIES} failed: ${axiosError.message}`,
         );
 
         if (statusCode === 404) {

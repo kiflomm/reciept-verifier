@@ -46,11 +46,10 @@ describe('VerifyController', () => {
     });
   });
 
-  it('maps legacy rejection to HTTP 400', async () => {
+  it('maps unsupported rejection to HTTP 400', async () => {
     mockCbeVerifier.verify.mockResolvedValue({
       success: false,
-      error:
-        'Legacy CBE receipts are not supported. Use a mbreciept.cbe.com.et token or URL.',
+      error: 'Unsupported CBE reference.',
       statusCode: 400,
     });
 
@@ -65,8 +64,7 @@ describe('VerifyController', () => {
       expect(exception.getStatus()).toBe(HttpStatus.BAD_REQUEST);
       expect(exception.getResponse()).toEqual({
         success: false,
-        error:
-          'Legacy CBE receipts are not supported. Use a mbreciept.cbe.com.et token or URL.',
+        error: 'Unsupported CBE reference.',
       });
     }
   });

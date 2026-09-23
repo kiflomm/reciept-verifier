@@ -47,12 +47,11 @@ describe('CbeVerifier', () => {
     );
   });
 
-  it('rejects legacy FT references', async () => {
+  it('rejects unsupported references', async () => {
     const result = await verifier.verify({ reference: 'FT2513001V2G' });
     expect(result).toEqual({
       success: false,
-      error:
-        'Legacy CBE receipts are not supported. Use a mbreciept.cbe.com.et token or URL.',
+      error: 'Unsupported CBE reference.',
       statusCode: 400,
     });
     expect(httpService.get).not.toHaveBeenCalled();
@@ -62,7 +61,7 @@ describe('CbeVerifier', () => {
     const result = await verifier.verify({ reference: 'short' });
     expect(result).toEqual({
       success: false,
-      error: 'Invalid CBE reference format.',
+      error: 'Unsupported CBE reference.',
       statusCode: 400,
     });
   });

@@ -4,8 +4,8 @@ NestJS service for verifying Ethiopian bank receipts.
 
 ## Scope (v1)
 
-- **Supported:** CBE (Commercial Bank of Ethiopia) **new** receipts only — `mbreciept.cbe.com.et` tokens/URLs via the public JSON API.
-- **Out of scope:** Legacy CBE (`FT…` + account suffix, `apps.cbe.com.et` PDF/Puppeteer). Do not reintroduce Puppeteer/PDF without an explicit product decision.
+- **Supported:** CBE (Commercial Bank of Ethiopia) — `mbreciept.cbe.com.et` tokens/URLs via the public JSON API.
+- **Out of scope:** Older CBE formats (`FT…` + account suffix, `apps.cbe.com.et` PDF/Puppeteer). Do not reintroduce Puppeteer/PDF without an explicit product decision.
 - Auth is not required in v1.
 
 ## Architecture
